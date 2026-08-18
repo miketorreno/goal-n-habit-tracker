@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { ClerkProvider, Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
+import { ClerkProvider } from '@clerk/nextjs'
 import localFont from "next/font/local";
 import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider"
-import { ModeToggle } from "@/components/mode-toggle";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { AppSidebar } from "@/components/app-sidebar"
+import { SiteHeader } from "@/components/site-header"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { Card, CardContent } from "@/components/ui/card";
+
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -38,24 +43,28 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <header className="flex justify-end items-center p-4 gap-4 h-16">
-              <Show when="signed-out">
-                <SignInButton />
-                <SignUpButton>
-                  <button className="bg-purple-700 text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
-                    Sign Up
-                  </button>
-                </SignUpButton>
-              </Show>
-              <Show when="signed-in">
-                <ModeToggle />
-                <UserButton />
-              </Show>
-            </header>
-            {children}
+            <TooltipProvider>
+              <SidebarProvider
+                style={
+                  {
+                    "--sidebar-width": "calc(var(--spacing) * 72)",
+                    "--header-height": "calc(var(--spacing) * 12)",
+                  } as React.CSSProperties
+                }
+              >
+                <AppSidebar variant="inset" />
+                <SidebarInset>
+                  <SiteHeader />
+                  <Card className="m-6 shadow-lg">
+                    <CardContent className="">
+                      {children}
+                    </CardContent>
+                  </Card>
+                </SidebarInset>
+              </SidebarProvider>
+            </TooltipProvider>
           </ThemeProvider>
         </ClerkProvider>
-
       </body>
     </html>
   );
