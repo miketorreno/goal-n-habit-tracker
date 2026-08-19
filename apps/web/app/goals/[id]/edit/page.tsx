@@ -14,7 +14,8 @@ export default function EditGoal() {
   const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this goal?")) {
       await removeGoal({ id });
-      return redirect("/goals");
+      // window.location.href = "/goals";
+      redirect("/goals");
     }
   };
 
