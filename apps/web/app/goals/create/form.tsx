@@ -1,7 +1,6 @@
 /* eslint-disable react/no-children-prop */
 "use client";
 
-import * as React from "react";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -22,51 +21,40 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import BackButton from "@/components/back-button";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
+import { useState } from "react";
 
 const formSchema = z.object({
   name: z
     .string()
     .min(5, "Goal name must be at least 5 characters.")
     .max(32, "Goal name must be at most 32 characters."),
-  parent: z
-    .string()
-    .min(5, "Goal name must be at least 5 characters.")
-    .max(32, "Goal name must be at most 32 characters."),
-  position: z.coerce.number(),
-  color: z.string(),
-  description: z
-    .string()
-    .min(20, "Description must be at most 20 characters.")
-    .max(100, "Description must be at most 100 characters."),
+  // parent: z.string(),
+  // position: z.number(),
+  // color: z.string(),
+  // description: z
+  //   .string()
+  //   .min(20, "Description must be at most 20 characters.")
+  //   .max(100, "Description must be at most 100 characters."),
 });
 
 export function CreateGoalForm() {
+  const createGoal = useMutation(api.goals.create);
+
   const form = useForm({
     defaultValues: {
       name: "",
-      parent: "",
-      position: 0,
-      color: "",
-      description: "",
+      // parent: "",
+      // position: 0,
     },
     validators: {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      toast("You submitted the following values:", {
-        description: (
-          <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-            <code>{JSON.stringify(value, null, 2)}</code>
-          </pre>
-        ),
-        position: "bottom-right",
-        classNames: {
-          content: "flex flex-col gap-2",
-        },
-        style: {
-          "--border-radius": "calc(var(--radius)  + 4px)",
-        } as React.CSSProperties,
-      });
+      if (!value.name.trim()) return;
+      await createGoal({ name: value.name.trim() });
+      form.reset();
     },
   });
 
@@ -109,7 +97,7 @@ export function CreateGoalForm() {
                   );
                 }}
               />
-              <form.Field
+              {/* <form.Field
                 name="parent"
                 children={(field) => {
                   const isInvalid =
@@ -133,8 +121,8 @@ export function CreateGoalForm() {
                     </Field>
                   );
                 }}
-              />
-              <form.Field
+              /> */}
+              {/* <form.Field
                 name="color"
                 children={(field) => {
                   const isInvalid =
@@ -158,8 +146,8 @@ export function CreateGoalForm() {
                     </Field>
                   );
                 }}
-              />
-              <form.Field
+              /> */}
+              {/* <form.Field
                 name="position"
                 children={(field) => {
                   const isInvalid =
@@ -190,8 +178,8 @@ export function CreateGoalForm() {
                     </Field>
                   );
                 }}
-              />
-              <form.Field
+              /> */}
+              {/* <form.Field
                 name="description"
                 children={(field) => {
                   const isInvalid =
@@ -223,7 +211,7 @@ export function CreateGoalForm() {
                     </Field>
                   );
                 }}
-              />
+              /> */}
             </div>
           </FieldGroup>
         </form>

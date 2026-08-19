@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   useTable,
   type ColumnDef,
@@ -28,6 +27,7 @@ import {
 
 import { features, type DataTableFeatures } from "./data-table-features";
 import Link from "next/link";
+import { useState } from "react";
 
 interface DataTableProps<TData extends RowData> {
   columns: ColumnDef<DataTableFeatures, TData>[];
@@ -38,13 +38,11 @@ export function DataTable<TData extends RowData>({
   columns,
   data,
 }: DataTableProps<TData>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] =
-    React.useState<ColumnVisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+    useState<ColumnVisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
   const table = useTable({
     features,
@@ -54,6 +52,7 @@ export function DataTable<TData extends RowData>({
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    getRowId: (row) => String((row as TData & { _id: string })._id),
     state: {
       sorting,
       columnFilters,
@@ -66,10 +65,10 @@ export function DataTable<TData extends RowData>({
     <div>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter goals..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

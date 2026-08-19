@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { createColumnHelper } from "@tanstack/react-table"
-import { MoreHorizontal, ArrowUpDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { createColumnHelper } from "@tanstack/react-table";
+import { MoreHorizontal, ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,22 +10,26 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
-import { type DataTableFeatures } from "./data-table-features"
-import { Checkbox } from "@/components/ui/checkbox"
+import { type DataTableFeatures } from "./data-table-features";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Id } from "@/convex/_generated/dataModel";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type Payment = {
-  id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
-  email: string
-}
+export type Goal = {
+  _id: Id<"goals">;
+  _creationTime: number;
+  parentId?: Id<"goals"> | undefined;
+  position?: number | undefined;
+  name: string;
+  userId: string;
+  status: string;
+};
 
 // Use `accessor` for data columns and `display` for columns without one.
-const columnHelper = createColumnHelper<DataTableFeatures, Payment>()
+const columnHelper = createColumnHelper<DataTableFeatures, Goal>();
 
 export const columns = columnHelper.columns([
   columnHelper.display({
@@ -50,10 +54,10 @@ export const columns = columnHelper.columns([
     enableSorting: false,
     enableHiding: false,
   }),
-  columnHelper.accessor("status", {
-    header: "Status",
+  columnHelper.accessor("parentId", {
+    header: "Parent",
   }),
-  columnHelper.accessor("email", {
+  columnHelper.accessor("name", {
     header: ({ column }) => {
       return (
         <Button
@@ -63,25 +67,19 @@ export const columns = columnHelper.columns([
           Email
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
   }),
-  columnHelper.accessor("amount", {
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"))
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount)
-
-      return <div className="text-right font-medium">{formatted}</div>
-    },
+  columnHelper.accessor("position", {
+    header: "Display Order",
+  }),
+  columnHelper.accessor("status", {
+    header: "Status",
   }),
   columnHelper.display({
     id: "actions",
     cell: ({ row }) => {
-      const payment = row.original
+      const goal = row.original;
 
       return (
         <DropdownMenu>
@@ -94,16 +92,16 @@ export const columns = columnHelper.columns([
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(goal._id)}
             >
-              Copy payment ID
+              Copy goal ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>View goal details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   }),
-])
+]);

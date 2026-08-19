@@ -10,6 +10,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
+import ConvexClientProvider from "@/components/convex-client-provider-with-clerk";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -41,35 +42,37 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-full flex flex-col`}
       >
-        {/* <ClerkProvider> */}
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <TooltipProvider>
-            <SidebarProvider
-              style={
-                {
-                  "--sidebar-width": "calc(var(--spacing) * 72)",
-                  "--header-height": "calc(var(--spacing) * 12)",
-                } as React.CSSProperties
-              }
-            >
-              <AppSidebar variant="inset" />
-              <SidebarInset>
-                <SiteHeader />
-                {/* <Card className="m-6 shadow-lg"> */}
-                {/* <CardContent className=""> */}
-                <main className="m-6">{children}</main>
-                {/* </CardContent> */}
-                {/* </Card> */}
-              </SidebarInset>
-            </SidebarProvider>
-          </TooltipProvider>
-        </ThemeProvider>
-        {/* </ClerkProvider> */}
+        <ClerkProvider telemetry={false}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ConvexClientProvider>
+              <TooltipProvider>
+                <SidebarProvider
+                  style={
+                    {
+                      "--sidebar-width": "calc(var(--spacing) * 72)",
+                      "--header-height": "calc(var(--spacing) * 12)",
+                    } as React.CSSProperties
+                  }
+                >
+                  <AppSidebar variant="inset" />
+                  <SidebarInset>
+                    <SiteHeader />
+                    {/* <Card className="m-6 shadow-lg"> */}
+                    {/* <CardContent className=""> */}
+                    <main className="m-6">{children}</main>
+                    {/* </CardContent> */}
+                    {/* </Card> */}
+                  </SidebarInset>
+                </SidebarProvider>
+              </TooltipProvider>
+            </ConvexClientProvider>
+          </ThemeProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

@@ -3,8 +3,8 @@
 
 import * as React from "react";
 import { useForm } from "@tanstack/react-form";
-import { toast } from "sonner";
 import * as z from "zod";
+import { useParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,13 +15,11 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroupTextarea,
-} from "@/components/ui/input-group";
 import BackButton from "@/components/back-button";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { get } from "http";
 
 const formSchema = z.object({
   name: z
@@ -30,51 +28,56 @@ const formSchema = z.object({
     .max(32, "Goal name must be at most 32 characters."),
   parent: z
     .string()
-    .min(5, "Goal name must be at least 5 characters.")
-    .max(32, "Goal name must be at most 32 characters."),
-  position: z.coerce.number(),
-  color: z.string(),
-  description: z
-    .string()
-    .min(20, "Description must be at most 20 characters.")
-    .max(100, "Description must be at most 100 characters."),
+    .max(48, "Parent must be at most 48 characters.")
+    .or(z.literal("")),
+  position: z.number(),
 });
 
 export function EditGoalForm() {
+  const { id } = useParams<{ id: Id<"goals"> }>();
+  const getGoal = useQuery(api.goals.get, { id });
+  const updateGoal = useMutation(api.goals.update);
+
   const form = useForm({
     defaultValues: {
-      name: "",
-      parent: "",
-      position: 0,
-      color: "",
-      description: "",
+      name: getGoal?.name ?? "",
+      parent: getGoal?.parentId ?? "",
+      position: getGoal?.position ?? 0,
     },
     validators: {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      toast("You submitted the following values:", {
-        description: (
-          <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-            <code>{JSON.stringify(value, null, 2)}</code>
-          </pre>
-        ),
-        position: "bottom-right",
-        classNames: {
-          content: "flex flex-col gap-2",
-        },
-        style: {
-          "--border-radius": "calc(var(--radius)  + 4px)",
-        } as React.CSSProperties,
+      if (!id || !value.name.trim() || !value.position) return;
+      await updateGoal({
+        id,
+        name: value.name.trim(),
+        position: value.position,
       });
+      form.reset();
     },
   });
 
+  if (getGoal === undefined) {
+    return (
+      <div className="text-center p-6 text-sm text-muted-foreground">
+        Loading goal data...
+      </div>
+    );
+  }
+  if (getGoal === null) {
+    return (
+      <div className="text-center p-6 text-sm text-destructive">
+        Goal not found.
+      </div>
+    );
+  }
+
   return (
-    <Card className="w-full">
+    <Card className="w-full" key={getGoal._id}>
       <CardContent>
         <form
-          id="create-goal-form"
+          id="edit-goal-form"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();
@@ -134,7 +137,7 @@ export function EditGoalForm() {
                   );
                 }}
               />
-              <form.Field
+              {/* <form.Field
                 name="color"
                 children={(field) => {
                   const isInvalid =
@@ -158,7 +161,7 @@ export function EditGoalForm() {
                     </Field>
                   );
                 }}
-              />
+              /> */}
               <form.Field
                 name="position"
                 children={(field) => {
@@ -173,7 +176,7 @@ export function EditGoalForm() {
                         id={field.name}
                         name={field.name}
                         type="number"
-                        value={field.state.value ?? 0}
+                        value={field.state.value}
                         onBlur={field.handleBlur}
                         onChange={(e) =>
                           field.handleChange(
@@ -191,7 +194,7 @@ export function EditGoalForm() {
                   );
                 }}
               />
-              <form.Field
+              {/* <form.Field
                 name="description"
                 children={(field) => {
                   const isInvalid =
@@ -223,7 +226,7 @@ export function EditGoalForm() {
                     </Field>
                   );
                 }}
-              />
+              /> */}
             </div>
           </FieldGroup>
         </form>
@@ -231,7 +234,7 @@ export function EditGoalForm() {
       <Field orientation="horizontal" className="justify-end pr-4 pt-4">
         <Button
           type="submit"
-          form="create-goal-form"
+          form="edit-goal-form"
           className="bg-cyan-600 hover:bg-cyan-700 active:bg-cyan-800 text-white"
         >
           Edit
