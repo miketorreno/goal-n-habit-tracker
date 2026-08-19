@@ -43,13 +43,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} min-h-full flex flex-col`}
       >
         <ClerkProvider telemetry={false}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <ConvexClientProvider>
+          <ConvexClientProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
               <TooltipProvider>
                 <SidebarProvider
                   style={
@@ -70,8 +70,8 @@ export default function RootLayout({
                   </SidebarInset>
                 </SidebarProvider>
               </TooltipProvider>
-            </ConvexClientProvider>
-          </ThemeProvider>
+            </ThemeProvider>
+          </ConvexClientProvider>
         </ClerkProvider>
       </body>
     </html>
