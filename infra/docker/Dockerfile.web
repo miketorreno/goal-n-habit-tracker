@@ -1,0 +1,71 @@
+# syntax=docker/dockerfile:1
+
+FROM dhi.io/node:24-alpine3.23-dev AS base
+
+WORKDIR /app
+
+RUN npm install -g npm@11.17.0
+
+# Dependencies
+FROM base AS deps
+
+# Root workspace manifests.
+COPY package.json package-lock.json turbo.json ./
+
+# Workspace manifests.
+COPY apps/web/package.json ./apps/web/package.json
+COPY packages/*/package.json ./packages/
+
+RUN --mount=type=cache,target=/root/.npm     npm ci
+
+# Build
+FROM base AS builder
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/package.json ./package.json
+COPY --from=deps /app/package-lock.json ./package-lock.json
+COPY --from=deps /app/turbo.json ./turbo.json
+
+# Copy the application and shared workspace packages.
+COPY apps/web ./apps/web
+COPY packages ./packages
+
+# Build the web workspace using the root package.json script.
+RUN npm run build
+
+# Production dependencies
+FROM base AS prod-deps
+
+COPY package.json package-lock.json turbo.json ./
+COPY apps/web/package.json ./apps/web/package.json
+COPY packages/*/package.json ./packages/
+
+RUN --mount=type=cache,target=/root/.npm     npm ci --omit=dev
+
+# Runtime
+FROM dhi.io/node:24-alpine3.23 AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+
+# Production dependencies.
+COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
+
+# Application files required by Next.js at runtime.
+COPY --from=builder --chown=node:node /app/apps/web/.next ./.next
+COPY --from=builder --chown=node:node /app/apps/web/public ./public
+COPY --from=builder --chown=node:node /app/apps/web/.next/standalone ./
+COPY --from=builder --chown=node:node /app/apps/web/.next/static ./apps/web/.next/static
+
+# The workspace package manifest is needed by npm's workspace resolution.
+COPY --from=builder --chown=node:node /app/package.json ./package.json
+COPY --from=builder --chown=node:node /app/apps/web/package.json ./apps/web/package.json
+
+USER node
+
+EXPOSE 3000
+
+CMD ["node", "apps/web/server.js"]
