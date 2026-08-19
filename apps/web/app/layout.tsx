@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from '@clerk/nextjs'
+import { ClerkProvider } from "@clerk/nextjs";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AppSidebar } from "@/components/app-sidebar"
-import { SiteHeader } from "@/components/site-header"
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent } from "@/components/ui/card";
+import ConvexClientProvider from "@/components/convex-client-provider-with-clerk";
 
-
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,35 +34,43 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)} suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} min-h-full flex flex-col`}>
-        <ClerkProvider>
+    <html
+      lang="en"
+      className={cn("font-sans", geist.variable)}
+      suppressHydrationWarning
+    >
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} min-h-full flex flex-col`}
+      >
+        <ClerkProvider telemetry={false}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
-            <TooltipProvider>
-              <SidebarProvider
-                style={
-                  {
-                    "--sidebar-width": "calc(var(--spacing) * 72)",
-                    "--header-height": "calc(var(--spacing) * 12)",
-                  } as React.CSSProperties
-                }
-              >
-                <AppSidebar variant="inset" />
-                <SidebarInset>
-                  <SiteHeader />
-                  <Card className="m-6 shadow-lg">
-                    <CardContent className="">
-                      {children}
-                    </CardContent>
-                  </Card>
-                </SidebarInset>
-              </SidebarProvider>
-            </TooltipProvider>
+            <ConvexClientProvider>
+              <TooltipProvider>
+                <SidebarProvider
+                  style={
+                    {
+                      "--sidebar-width": "calc(var(--spacing) * 72)",
+                      "--header-height": "calc(var(--spacing) * 12)",
+                    } as React.CSSProperties
+                  }
+                >
+                  <AppSidebar variant="inset" />
+                  <SidebarInset>
+                    <SiteHeader />
+                    {/* <Card className="m-6 shadow-lg"> */}
+                    {/* <CardContent className=""> */}
+                    <main className="m-6">{children}</main>
+                    {/* </CardContent> */}
+                    {/* </Card> */}
+                  </SidebarInset>
+                </SidebarProvider>
+              </TooltipProvider>
+            </ConvexClientProvider>
           </ThemeProvider>
         </ClerkProvider>
       </body>

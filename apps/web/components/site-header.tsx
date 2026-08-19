@@ -1,7 +1,7 @@
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
-import { ModeToggle } from "./mode-toggle"
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { ModeToggle } from "./mode-toggle";
 
 export function SiteHeader() {
   return (
@@ -16,7 +16,7 @@ export function SiteHeader() {
         </div>
         {/* <h1 className="text-base font-medium">Documents</h1> */}
         <div className="flex justify-end items-center p-4 gap-6 h-16">
-          <ModeToggle />
+          {/* <ModeToggle /> */}
           <Show when="signed-out">
             <SignInButton />
             <SignUpButton>
@@ -31,5 +31,5 @@ export function SiteHeader() {
         </div>
       </div>
     </header>
-  )
+  );
 }
