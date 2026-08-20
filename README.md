@@ -1,6 +1,56 @@
 # Gamified Goal and Habit Tracker
 
-### Architecture
+## Technologies Used
+
+Built with a modern tech stack to ensure efficiency, scalability, and an engaging user experience:
+
+- Framework: [Next.js](https://nextjs.org/)
+- Backend: [Convex](https://www.convex.dev/)
+- Authentication: [Clerk](https://clerk.com/)
+- Styling: [Tailwind CSS](https://tailwindcss.com/)
+- UI: [shadcn/ui](https://ui.shadcn.com/)
+
+## Getting Started
+
+```bash
+# Clone the repository
+git clone https://github.com/miketorreno/goal-n-habit-tracker.git
+
+# Navigate to the project
+cd goal-n-habit-tracker
+
+# Install dependencies
+npm install
+
+# Navigate to the web app
+cd apps/web
+
+# Set up environment variables
+cp .env.example .env
+cp .env.local.example .env.local
+
+# Add env variables in
+.env
+.env.local
+
+# Install Convex
+npm install convex
+npx convex dev
+# npx convex dashboard
+
+
+# Open a second terminal
+
+# Navigate to the project
+cd goal-n-habit-tracker
+
+# Start the development server
+npm run dev
+```
+
+Visit `http://localhost:3000` to see the app running.
+
+## Architecture
 
 ```text
                     ┌─────────────────────┐
@@ -38,7 +88,7 @@
                Homelab / AWS / Other Cloud
 ```
 
-### Repository Structure
+## Repository Structure
 
 ```text
 goal-n-habit-tracker/
